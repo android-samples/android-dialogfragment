@@ -8,6 +8,8 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.os.Debug;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -91,17 +93,52 @@ public class MainActivity extends Activity {
 			// 設定
 			setStyle(style, theme);
 		}
+		
+		ViewGroup mContainer;
+		@Override
+		public void onResume() {
+			super.onResume();
+			// 階層表示
+			Log.d("test", "-----------");
+			printView(mContainer, "");
+		}
+		private void printView(View v, String indent){
+			if(v == null){
+				Log.d("test", indent + "null");
+				return;
+			}
+			Log.d("test", indent + v.getClass().toString());
+			if(v instanceof ViewGroup){
+				ViewGroup group = (ViewGroup)v;
+				int n = group.getChildCount();
+				for(int i = 0; i < n; i++){
+					View child = group.getChildAt(i);
+					printView(child, indent + "  ");
+				}
+			}
+		}
+
+		@Override
+		public void onStart() {
+			super.onStart();
+			// 階層表示
+			Log.d("test", "===========");
+			printView(mContainer, "");
+		}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
+			mContainer = container;
+			Log.d("test", "-=-=" + container);
+			
 			// タイトル設定
 			getDialog().setTitle("Dialog test");
 			
 			// Fragment用レイアウトをセット
 			View v = inflater.inflate(
 				R.layout.fragment_main,
-				container,
+				container, // ここにはnullが来るので今回は第3引数を指定してもしなくても挙動は変わらない…
 				false // attach to root (今回はrootにはアタッチしない)
 			);
 			
